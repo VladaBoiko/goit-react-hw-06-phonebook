@@ -1,5 +1,6 @@
+import { useDispatch } from 'react-redux';
+import { addContacts } from 'redux/contactsSlice';
 import { Formik } from 'formik';
-import { nanoid } from 'nanoid';
 import * as yup from 'yup';
 import { Input, Forma, Label, Button, ErMessage } from './Form.styled';
 
@@ -9,31 +10,12 @@ const schema = yup.object().shape({
 const formValues = {
   name: '',
   number: '',
-  id: null,
 };
 
-// const schema = yup.object({
-//   name: yup
-//     .string()
-//     .label('Full Name')
-//     .required()
-//     .test(
-//       'is-full-name',
-//       'Please enter both your first and last name',
-//       function (value) {
-//         const nameArr = value.split(' ');
-//         return nameArr.length >= 2;
-//       }
-//     ),
-// });
-const generateID = () => {
-  return nanoid(4);
-};
-export const AddForm = ({ updateContacts, iNeedName }) => {
+export const AddForm = () => {
+  const dispatch = useDispatch();
   const handleSubmit = (values, { resetForm }) => {
-    updateContacts(values);
-    iNeedName(values);
-    values.id = generateID();
+    dispatch(addContacts(values));
     resetForm();
   };
 

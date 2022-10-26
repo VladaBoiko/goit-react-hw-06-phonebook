@@ -1,31 +1,42 @@
+import { useSelector } from 'react-redux';
+import { getContacts, getFilter } from 'redux/selectors';
 import { ContactItem } from '../ContactItem/ContactItem';
 import { List } from './ContactsList.styled';
-import PropTypes from 'prop-types';
-export const ContactList = ({ states, removeContact }) => {
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
+
+const filtered = (contacts, filter) => {
+  let filterContacts = null;
+  if (filter === '') {
+    filterContacts = contacts;
+    return filterContacts;
+  }
+  const normalizedFilter = filter.toLowerCase();
+  filterContacts = contacts.filter(contact =>
+    contact.text.name.toLowerCase().includes(normalizedFilter)
+  );
+  if (filterContacts.length < 1) {
+    Notify.warning('No matches =(');
+  }
+  return filterContacts;
+};
+
+export const ContactList = () => {
+  const states = useSelector(getContacts);
+  const filter = useSelector(getFilter);
+  const visibleContacts = filtered(states.contacts, filter.filter);
   return (
     <List>
-      {states.map(state => {
+      {visibleContacts.map(state => {
+        console.log(state);
         return (
           <ContactItem
-            name={state.name}
+            name={state.text.name}
             key={state.id}
-            number={state.number}
-            removeContact={removeContact}
+            number={state.text.number}
             id={state.id}
           />
         );
       })}{' '}
     </List>
   );
-};
-
-ContactList.propTypes = {
-  states: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      number: PropTypes.string.isRequired,
-    })
-  ),
-  removeContact: PropTypes.func.isRequired,
 };
